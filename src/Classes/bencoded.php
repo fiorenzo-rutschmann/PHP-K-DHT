@@ -45,7 +45,7 @@ class bencode {
 	 * @param   string  String to decode
 	 * @return  mixed   Outputted data
 	 */
-	public function decode($string=NULL, &$i=0)
+	public static function decode($string=NULL, &$i=0)
 	{
 			if (is_string($string))
 			{

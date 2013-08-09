@@ -1,6 +1,6 @@
 <?php 
 
-	include "dht.class.php";
+	include "..\Client\dht.class.php";
 	//spl_autoload_register ();
 	
 	
@@ -47,8 +47,8 @@
 	{
 		$lib = new phpdht();
 		
-		$lib->ping();
-		
+		//$lib->ping();
+		$lib->get_peers();
 		
 	}
 	

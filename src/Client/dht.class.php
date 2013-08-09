@@ -3,17 +3,17 @@
 // CREATED BY FIORENZO RUTSCHMANN
 // FLASHMAN42@WINDOWSLIVE.COM
 //--------------------------------
-include "../Classes/bencoded.php";
+include "..\Classes\bencoded.php";
 
 class phpdht
 {
 	private $node_id = "abcdefghij0123456789";
-	private $id = 52;
+	private $id = 0;
 	private $socketManager;
 	
 	public function __construct()
 	{
-	  echo "constructor of phpdht \n";
+		$this->id = rand(3,1000);
 	}
 	
 	public function ping()
@@ -21,11 +21,10 @@ class phpdht
 		//create socket
 		$socket  = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
 		//socket_bind($socket, '0.0.0.0', 6881);
-		//$packet = "d1:ad2:id20:abcdefghij0123456789e1:q4:ping1:t2:aa1:y1:qe";
-		//$packet = $this->construct_bencode(array("id" => $this->get_unique_node_id()), array("q" => "ping", "t" => $this->unique_id(), "y" => "q" ) );
-
-		$packet = bencode::encode(array("id" => $this->get_unique_node_id()), array("q" => "ping", "t" => $this->unique_id(), "y" => "q"));
-		echo "\n packet=" + $packet; 
+		$packet = "d1:ad2:id20:abcdefghij0123456789e1:q4:ping1:t2:441:y1:qe";
+		//$packet = bencode::encode(array("id" => $this->get_unique_node_id()), array("q" => "ping", "t" => $this->unique_id(), "y" => "q"));
+		
+		echo "\n packet=" . $packet; 
 		
 		$host = "router.bittorrent.com";
 		$port = 6881;
@@ -49,7 +48,7 @@ class phpdht
 		//$packet = "d1:ad2:id20:abcdefghij0123456789e1:q4:ping1:t2:aa1:y1:qe";
 		$socket  = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
 
-		$packet = $this->construct_bencode(array("id" => $this->get_unique_node_id(), "info_hash" => hex2bin("2E3781F347760F204B278B22AE4ADF9320AACE5E")), array("q" => "get_peers", "t" => $this->unique_id(), "y" => "q" ) );
+		$packet = bencode::encode(array("id" => $this->get_unique_node_id(), "info_hash" => hex2bin("2E3781F347760F204B278B22AE4ADF9320AACE5E")), array("q" => "get_peers", "t" => $this->unique_id(), "y" => "q" ) );
 		echo "\n packet=" + $packet; 
 		
 		$host = "router.bittorrent.com";
@@ -71,11 +70,10 @@ class phpdht
 	//private functions
 	//unique_id returns a two byte code to repersent the query (base 36)
 
-	private function unique_id()
+	public function unique_id()
 	{
-
 		//loop back around
-		if ($this->id < 1290) //1295 but jtms
+		if ($this->id >= 1290)
 		{
 			$this->id = 0;
 		}
@@ -86,10 +84,9 @@ class phpdht
 		//pad to 2 characters
 		$ret = str_pad($ret, 2, "0", STR_PAD_LEFT); 
 		
-		
 		//increment id silly
-		$this->id++;
-		
+		$this->id = $this->id + 1;
+	
 		return $ret;
 	}
 
