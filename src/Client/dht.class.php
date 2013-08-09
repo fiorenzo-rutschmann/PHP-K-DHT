@@ -3,7 +3,7 @@
 // CREATED BY FIORENZO RUTSCHMANN
 // FLASHMAN42@WINDOWSLIVE.COM
 //--------------------------------
-include "bencoded.php";
+include "../Classes/bencoded.php";
 
 class phpdht
 {
@@ -14,14 +14,6 @@ class phpdht
 	public function __construct()
 	{
 	  echo "constructor of phpdht \n";
-	}
-	
-	public function connect()
-	{
-	}
-	
-	public function disconnect()
-	{
 	}
 	
 	public function ping()
@@ -55,7 +47,6 @@ class phpdht
 	{
 		//2E3781F347760F204B278B22AE4ADF9320AACE5E
 		//$packet = "d1:ad2:id20:abcdefghij0123456789e1:q4:ping1:t2:aa1:y1:qe";
-		
 		$socket  = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
 
 		$packet = $this->construct_bencode(array("id" => $this->get_unique_node_id(), "info_hash" => hex2bin("2E3781F347760F204B278B22AE4ADF9320AACE5E")), array("q" => "get_peers", "t" => $this->unique_id(), "y" => "q" ) );
@@ -101,13 +92,7 @@ class phpdht
 		
 		return $ret;
 	}
-	
 
-	
-	private function decode($bencode)
-	{
-
-	}
 	
 	private function get_unique_node_id()
 	{
@@ -131,35 +116,4 @@ class phpdht
 	}
 	
 }
-
-class socket_manager
-{
-	public function __construct()
-	{
-	  echo "Hello, World";
-	}
-	
-	public function make_connection_thread($host, $port, $packet, $response_function )
-	{
-		
-	}
-}
-
-class thread_for_request
-{
-	public function __construct()
-	{
-	  echo "Hello, World";
-	}
-}
-
-class nodes
-{
-	public function __construct()
-	{
-	  echo "Hello, World";
-	}
-}
-
-
 ?>

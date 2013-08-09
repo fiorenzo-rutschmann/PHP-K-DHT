@@ -6,7 +6,6 @@ class bencode {
 	{
 	}
 
-
 	//construct bencode 
 	//(assoc array)$array = arguments (query node ID, target, info hash), 
 	//(assoc array)$type = protocol stuff
@@ -39,74 +38,6 @@ class bencode {
 		return $ret;
 	}
 
-	
-	
-	/**
-	* Encodes data to bencoded string.
-	*
-	* @param   mixed   Data to encode
-	* @return  string  Bencoded string
-	*/
-	
-	/*
-	public function encode($string=NULL)
-	{
-			// Check if item is null
-			if (is_null($string))
-			{
-					return '0:';
-			}
-
-			// Check if item is integer
-			if (is_int($string))
-			{
-					return 'i'.$string.'e';
-			}
-
-			// Check if item is string
-			if (is_string($string))
-			{
-					return strlen($string).':'.$string;
-			}
-
-			// Check if item is array
-			if (is_array($string))
-			{
-					// Is the array assoc
-					if (self::is_assoc($string))
-					{
-							ksort($string, SORT_STRING);
-
-							$buffer = 'd';
-
-							foreach ($string as $key => $v)
-							{
-									$buffer .= self::encode(strval($key));
-									$buffer .= self::encode($v);
-							}
-
-							$buffer .= 'e';
-					}
-					else
-					{
-							ksort($string, SORT_NUMERIC);
-
-							$buffer = 'l';
-
-							foreach ($string as $v)
-							{
-									$buffer .= self::encode($v);
-							}
-
-							$buffer .= 'e';
-					}
-
-					return $buffer;
-			}
-
-			return FALSE;
-	}
-*/
 	
 	/**
 	 * Decodes an bencoded string to data
@@ -239,7 +170,7 @@ class bencode {
 	{
 		if ( ! is_array($arr))
 		{
-			throw new \InvalidArgumentException('The parameter must be an array.');
+			throw new InvalidArgumentException('The parameter must be an array.');
 		}
 
 		$counter = 0;
