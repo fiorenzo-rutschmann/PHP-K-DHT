@@ -1,6 +1,9 @@
 <?php
 class DHT_node {
 	private $compact; //DHT compact form
+	private $last_communication; //last successful
+	private $bad_counter; //unsuccessful attempts
+	private $info_hash //array of info_hashes the node has annouced to
 	
 	public function __construct($compact)
 	{
@@ -13,6 +16,9 @@ class DHT_node {
 		{
 			throw new Exception("Input not Correct Format. \n");
 		}
+		
+		//initalise info_hash array
+		$this->info_hash = new array();
 	}
 	
 	public function return_node_id()
@@ -33,6 +39,27 @@ class DHT_node {
 	public function return_compact_form()
 	{
 		return $this->$compact;
+	}
+	
+	public function update_communication()
+	{
+		$this->last_communication = time();
+		$this->bad_counter = 0;
+	}
+	
+	public function update_bad()
+	{
+		$this->bad_counter += 1;
+	}
+	
+	public function get_info_hashes()
+	{
+		return $this->info_hash();
+	}
+	
+	public function add_info_hash($info_hash)
+	{
+		array_push($this->$info_hash, $info_hash);
 	}
 }
 
