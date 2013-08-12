@@ -10,6 +10,42 @@ class routing_table
 		$buckets = new array();
 		array_push(new bucket(0, 2^160)); //dont know if powers work in code if not then { pow($number,$power)}
 	}
+	
+	public function add_node()
+	{
+	}
+	
+	//return node if found
+	//return FALSE if not found
+	public function find_node()
+	{
+		
+	}
+	
+	public function get_eight_closest_nodes($node_id)
+	{
+		$ret = new array();
+		
+		foreach($this->buckets as $key => $value)
+		{
+			if ($value->in_keyspace($node_id))
+			{
+				
+			}
+		}
+		
+		
+	}
+	
+	private function split_bucket($bucket)
+	{
+		//find bucket in array
+		//split bucket
+		//add new bucket to the array
+		array_splice($this->buckets, $index, 0, $new_bucket);
+	}
+	
+	
 }
 
 class bucket 
@@ -56,6 +92,16 @@ class bucket
 		array_push($this->elements, $node);
 		
 		return 0;
+	}
+	
+	public function in_keyspace($node_id)
+	{
+		if ( $node_id >= $this->start && $node_id <= $this->finish)
+		{
+			return true;
+		}
+		
+		return false;
 	}
 	
 	public function return_nodes()
