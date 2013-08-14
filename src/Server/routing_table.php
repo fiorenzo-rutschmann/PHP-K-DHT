@@ -11,15 +11,68 @@ class routing_table
 		array_push(new bucket(0, 2^160)); //dont know if powers work in code if not then { pow($number,$power)}
 	}
 	
-	public function add_node()
+	public function add_node($compact)
+	{
+		//make node
+		$node = new DHT_node($compact);
+		
+		//find bucket with keyspace
+		
+		foreach ( $this->buckets as &$i )
+		{
+			if ($i->in_keyspace($node->return_node_id()))
+			{
+				//check to see if bucket full
+				if ($i->return_nodes_count() >= 8)
+				{
+					//ifso then splitbucket
+					$this->split_bucket($i);
+					//bloody recursion better no loop forever.
+					return $this->add_node($compact);
+				}
+				else
+				{
+					// if not add node to bucket
+					$error = $i->add_node($node);
+					
+					//check for error -> TODO implement code to handle error codes 1 to 4
+					switch($error)
+					{
+						case 0: return true; break;
+						default: return false; break;
+					}
+				}
+			}
+			
+		}
+		
+		//hail mary
+		return false;
+	}
+	
+	//TODO: 
+	public function add_node($node_id, $ip, $port)
 	{
 	}
 	
 	//return node if found
 	//return FALSE if not found
-	public function find_node()
+	public function find_node($node_id)
 	{
-		
+		//& =we want reference so we can change values
+		foreach( $this->buckets as &$i)
+		{
+			if ($i->in_keyspace($node_id))
+			{
+				if ($i->in_bucket($node_id))
+				{
+					//having trust in code not to put a if statement here,
+					return $i->get_node($node_id);
+				}
+			}
+		}
+
+		return false;
 	}
 	
 	public function get_eight_closest_nodes($node_id)
@@ -37,14 +90,21 @@ class routing_table
 		
 	}
 	
-	private function split_bucket($bucket)
+	private function split_bucket(&$bucket)
 	{
-		//find bucket in array
+		$index = array_search($bucket, $this->buckets);
+		
+		if ($index == FALSE)
+		{
+			throw new Exception("\n Class: routing_table Function: split_bucket Cause: \$bucket not found.");
+			return 0;
+		}
+		
 		//split bucket
+		$new_bucket = $bucket->split();
 		//add new bucket to the array
 		array_splice($this->buckets, $index, 0, $new_bucket);
 	}
-	
 	
 }
 
@@ -99,6 +159,37 @@ class bucket
 		if ( $node_id >= $this->start && $node_id <= $this->finish)
 		{
 			return true;
+		}
+		
+		return false;
+	}
+	
+	public function in_bucket($node_id)
+	{
+		foreach($elements as $i)
+		{
+			if ($i->return_node_id() == $node_id)
+			{
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	public function return_nodes_count()
+	{
+		return count($this->elements);
+	}
+	
+	public function get_node()
+	{
+		foreach($elements as $i)
+		{
+			if ($i->return_node_id() == $node_id)
+			{
+				return $i;
+			}
 		}
 		
 		return false;
