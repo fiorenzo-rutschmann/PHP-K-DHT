@@ -63,8 +63,7 @@ class DHT_node {
 	}
 }
 
-class node
-{
+class node {
 	private $compact; //4 x ip + 2 x port 
 	
 	public function __construct($compact)

@@ -68,7 +68,45 @@
 		$info_hash = readline("Enter a valid info_hash:");
 		
 		$lib = new phpdht();
-		$lib->get_peers($info_hash);
+		$peers = $lib->get_peers($info_hash);
+		
+		//ok heres the tricky part, get_peers in the specification returns either nodes or bittorrent peers.
+		
+		
+		//not yet implemented - need to finish off get_peers() first;
+		//differentiate between returned nodes or peers or FALSE
+		if ($peers == FALSE)
+		{
+			echo "-------- FUNCTION RETURNED FALSE -------------- \n";
+			
+			XJIOP();
+			return;
+		}
+		else if ( get_class($peers[0]) == "DHT_node")
+		{
+			echo "Function returned DHT nodes \n";
+			
+			echo "will create functionality later for this...\n"
+			
+			XJIOP();
+			return;
+		}
+		else if ( get_class($peers[0]) == "node")
+		{
+			echo "Function returned Bittorrent nodes at address's : \n";
+			foreach($peers as $i)
+			{
+				echo "ip: $i->return_ip() posrt: $i->return_port() \n";
+			}
+		}
+		else
+		{
+			echo "Function returned something random, please place an issue with the project and copy in the below data; \n ";
+			print_r($peers);
+			
+			return;
+		}
+		
 	}
 	
 	function readline( $prompt = '' )
