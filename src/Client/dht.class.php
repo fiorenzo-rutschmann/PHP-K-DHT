@@ -42,21 +42,35 @@ class phpdht
 
 	}
 	
-	public function get_peers()
+	public function get_peers($info_hash)
 	{
-		//2E3781F347760F204B278B22AE4ADF9320AACE5E
-		//$packet = "d1:ad2:id20:abcdefghij0123456789e1:q4:ping1:t2:aa1:y1:qe";
+		// test info hash = 2E3781F347760F204B278B22AE4ADF9320AACE5E
+		
+		//create a UDP socket to send commands through
 		$socket  = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
 
-		$packet = bencode::encode(array("id" => $this->get_unique_node_id(), "info_hash" => hex2bin("2E3781F347760F204B278B22AE4ADF9320AACE5E")), array("q" => "get_peers", "t" => $this->unique_id(), "y" => "q" ) );
-		echo "\n packet=" + $packet; 
+		//Create Command Packet
+		$packet = bencode::encode(array("id" => $this->get_unique_node_id(), "info_hash" => hex2bin($info_hash)), array("q" => "get_peers", "t" => $this->unique_id(), "y" => "q" ) );
 		
+		//TODO: change these to parameters
 		$host = "router.bittorrent.com";
 		$port = 6881;
+		
 		socket_sendto($socket, $packet, strlen($packet), 0, $host, $port);
-		 
-		socket_recvfrom($socket, $buf, 12000, 0, $host, $port);
-		echo "here\n";
+		
+		//set timeout
+		$timeout = array('sec' => 5, 'usec' => 0);
+        socket_set_option($socket, SOL_SOCKET, SO_RCVTIMEO, $timeout);
+		
+		//recieve data
+		try {
+			socket_recvfrom($socket, $buf, 12000, 0, $host, $port);
+		} catch (Exception $e) {
+			echo "Server did not respond to Request ";
+			return FALSE;
+		}
+		
+		//close socket so bad shit don't happen 
 		socket_close($socket);
 		
 		echo $buf;

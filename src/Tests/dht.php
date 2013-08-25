@@ -34,7 +34,13 @@
 		$port = 6881;
 		socket_sendto($socket, $packet, strlen($packet), 0, $host, $port);
 		
-		socket_recvfrom($socket, $buf, 12000, 0, $host, $port);
+		try {
+			socket_recvfrom($socket, $buf, 12000, 0, $host, $port);
+		}
+		catch (Exception $e)
+		{
+			echo "";
+		}
 		
 		
 		socket_close($socket);
@@ -52,6 +58,28 @@
 		
 	}
 	
-	dhtlibping();
+	
+	//TESTING FOR USER XJIOP, get_peers()
+	function XJIOP()
+	{	
+		echo "PHP K DHT: \n";
+		echo "Running get_peers \n";
+		echo "valid info_hash = 2E3781F347760F204B278B22AE4ADF9320AACE5E \n";
+		$info_hash = readline("Enter a valid info_hash:");
+		
+		$lib = new phpdht();
+		$lib->get_peers($info_hash);
+	}
+	
+	function readline( $prompt = '' )
+	{
+		echo $prompt;
+		return rtrim( fgets( STDIN ), "\n" );
+	}
+	
+	//just to take away the socket notice
+	error_reporting(E_ALL ^ E_WARNING);
+	XJIOP();
+	//dhtlibping();
 ?>
 
