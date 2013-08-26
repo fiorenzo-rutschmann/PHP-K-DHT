@@ -3,7 +3,10 @@
 // CREATED BY FIORENZO RUTSCHMANN
 // FLASHMAN42@WINDOWSLIVE.COM
 //--------------------------------
-include "..\Classes\bencoded.php";
+
+include '..\Classes\bencoded.php';
+include '..\Classes\nodeExtract.php';
+
 
 class phpdht
 {
@@ -42,10 +45,13 @@ class phpdht
 
 	}
 	
-	public function get_peers($info_hash)
+	public function get_peers($info_hash, $host = "router.bittorrent.com" , $port = 6881)
 	{
 		// test info hash = 2E3781F347760F204B278B22AE4ADF9320AACE5E
 		
+		echo "connecting to server = $host and port: $port \n";
+		//echo "info_hash = ". $info_hash . "j\n";
+		echo hex2bin($info_hash);
 		//create a UDP socket to send commands through
 		$socket  = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
 
@@ -53,8 +59,8 @@ class phpdht
 		$packet = bencode::encode(array("id" => $this->get_unique_node_id(), "info_hash" => hex2bin($info_hash)), array("q" => "get_peers", "t" => $this->unique_id(), "y" => "q" ) );
 		
 		//TODO: change these to parameters
-		$host = "router.bittorrent.com";
-		$port = 6881;
+		//$host = "router.bittorrent.com";
+		//$port = 6881;
 		
 		socket_sendto($socket, $packet, strlen($packet), 0, $host, $port);
 		
@@ -70,10 +76,21 @@ class phpdht
 			return FALSE;
 		}
 		
+		// $status = socket_get_status($socket);
+
+		// if ($status['timed_out']) {
+			// echo "socket timed out\n";
+			// return FALSE;
+		// }
+		
 		//close socket so bad shit don't happen 
 		socket_close($socket);
 		
-		echo $buf;
+		//format the output
+		//print_r( bencode::decode($buf));
+		
+		return nodeExtract::return_nodes(bencode::decode($buf));
+	
 	}
 	
 	public function announce_peer()

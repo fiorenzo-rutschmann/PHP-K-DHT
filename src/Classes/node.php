@@ -3,7 +3,7 @@ class DHT_node {
 	private $compact; //DHT compact form
 	private $last_communication; //last successful
 	private $bad_counter; //unsuccessful attempts
-	private $info_hash //array of info_hashes the node has annouced to
+	private $info_hash; //array of info_hashes the node has annouced to
 	
 	public function __construct($compact)
 	{
@@ -18,7 +18,7 @@ class DHT_node {
 		}
 		
 		//initalise info_hash array
-		$this->info_hash = new array();
+		$this->info_hash = Array();
 	}
 	
 	public function return_node_id()

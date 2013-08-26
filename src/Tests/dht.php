@@ -1,8 +1,7 @@
 <?php 
 
-	include "..\Client\dht.class.php";
+	include '..\Client\dht.class.php';
 	//spl_autoload_register ();
-	
 	
 	function ping($host, $timeout = 1) {
 			/* ICMP ping packet with a pre-calculated checksum */
@@ -22,7 +21,6 @@
 	}
 	
 	//echo ping("google.com");
-	
 	
 	function dhtping()
 	{
@@ -65,17 +63,20 @@
 		echo "PHP K DHT: \n";
 		echo "Running get_peers \n";
 		echo "valid info_hash = 2E3781F347760F204B278B22AE4ADF9320AACE5E \n";
-		$info_hash = readline("Enter a valid info_hash:");
+		//$info_hash = readline("Enter a valid info_hash:");
+		$info_hash = "2E3781F347760F205B378B22AE4ADF9320AACE5E";
+		
 		
 		$lib = new phpdht();
-		$peers = $lib->get_peers($info_hash);
+		$peers = $lib->get_peers($info_hash, "dht.transmissionbt.com", 6881);
 		
+		print_r($peers);
 		//ok heres the tricky part, get_peers in the specification returns either nodes or bittorrent peers.
 		
 		
 		//not yet implemented - need to finish off get_peers() first;
 		//differentiate between returned nodes or peers or FALSE
-		if ($peers == FALSE)
+		/*if ($peers == FALSE)
 		{
 			echo "-------- FUNCTION RETURNED FALSE -------------- \n";
 			
@@ -86,7 +87,7 @@
 		{
 			echo "Function returned DHT nodes \n";
 			
-			echo "will create functionality later for this...\n"
+			echo "will create functionality later for this...\n";
 			
 			XJIOP();
 			return;
@@ -105,7 +106,7 @@
 			print_r($peers);
 			
 			return;
-		}
+		}*/
 		
 	}
 	
@@ -115,9 +116,16 @@
 		return rtrim( fgets( STDIN ), "\n" );
 	}
 	
-	//just to take away the socket notice
-	error_reporting(E_ALL ^ E_WARNING);
+	function quick()
+	{
+		echo hex2bin("2E3781F347760F204B278B22AE4ADF9320AACE5E");
+	}
+	
 	XJIOP();
+	//quick();
+	//just to take away the socket notice
+	//error_reporting(E_ALL ^ E_WARNING);
+	
 	//dhtlibping();
 ?>
 
