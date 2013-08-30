@@ -1,5 +1,5 @@
 <?php
-include '..\Classes\node.php';
+include_once '..\Classes\node.php';
 
 class nodeExtract {
 
@@ -18,23 +18,23 @@ class nodeExtract {
 			{
 				array_push($retArray, new node($i));
 			}
-			echo "1";
+
 			return $retArray;
 		}
 		else if (isset($array["nodes"]))
 		{
 			$retArray = Array();
 			
-			for($i = 0; $i <= strlen($array["nodes"]); $i += 26)
+			for($i = 0; $i <= strlen($array["nodes"]) -1; $i += 26)
 			{
-				array_push($retArray, substr($array["nodes"], $i, 26));
+				array_push($retArray, new DHT_node(substr($array["nodes"], $i, 26)));
 			}
-			echo "2";
+
 			return $retArray;
 		}
 		else
 		{
-			echo "3";
+
 			return FALSE;
 		}
 	}
