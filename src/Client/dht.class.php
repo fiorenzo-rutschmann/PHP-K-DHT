@@ -1,12 +1,8 @@
 <?php
-//--------------------------------
-// CREATED BY FIORENZO RUTSCHMANN
-// FLASHMAN42@WINDOWSLIVE.COM
-//--------------------------------
 
-include '..\Classes\bencoded.php';
-include '..\Classes\nodeExtract.php';
-
+include_once '..\Classes\bencoded.php';
+include_once '..\Classes\nodeExtract.php';
+include_once '..\Classes\node_holder.php';
 
 class phpdht
 {
@@ -45,52 +41,125 @@ class phpdht
 
 	}
 	
-	public function get_peers($info_hash, $host = "router.bittorrent.com" , $port = 6881)
+	
+	//blocking - returns array of dht nodes or peers 
+	private function get_peers_blocking($info_hash, $host = "router.bittorrent.com" , $port = 6881)
 	{
-		// test info hash = 2E3781F347760F204B278B22AE4ADF9320AACE5E
-		
-		echo "connecting to server = $host and port: $port \n";
-		//echo "info_hash = ". $info_hash . "j\n";
-		echo hex2bin($info_hash);
 		//create a UDP socket to send commands through
 		$socket  = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
 
 		//Create Command Packet
 		$packet = bencode::encode(array("id" => $this->get_unique_node_id(), "info_hash" => hex2bin($info_hash)), array("q" => "get_peers", "t" => $this->unique_id(), "y" => "q" ) );
 		
-		//TODO: change these to parameters
-		//$host = "router.bittorrent.com";
-		//$port = 6881;
-		
 		socket_sendto($socket, $packet, strlen($packet), 0, $host, $port);
 		
 		//set timeout
 		$timeout = array('sec' => 5, 'usec' => 0);
         socket_set_option($socket, SOL_SOCKET, SO_RCVTIMEO, $timeout);
-		
+
+		$time = time();
 		//recieve data
 		try {
 			socket_recvfrom($socket, $buf, 12000, 0, $host, $port);
 		} catch (Exception $e) {
-			echo "Server did not respond to Request ";
+			echo "Error";
 			return FALSE;
 		}
 		
-		// $status = socket_get_status($socket);
-
-		// if ($status['timed_out']) {
-			// echo "socket timed out\n";
-			// return FALSE;
-		// }
+		//have to manually do the timeout, cant seem to get info from this socket
+		if ((time() - $time) >= 4)
+		{
+			socket_close($socket);
+			return FALSE;
+		}
 		
 		//close socket so bad shit don't happen 
 		socket_close($socket);
 		
-		//format the output
-		//print_r( bencode::decode($buf));
-		
 		return nodeExtract::return_nodes(bencode::decode($buf));
 	
+	}
+	
+	//nonblocking returns socket
+	private function get_peers_non_blocking($info_hash, $host = "router.bittorrent.com" , $port = 6881)
+	{
+	
+	}
+	
+	public function get_peers_for_info_hash_blocking($info_hash)
+	{
+		//create starting output
+		echo "\n";
+		echo "Collecting peers for " . $info_hash . "\n";
+		echo "\n";
+		
+		//create class to hold nodes.
+		$nodes_holder = new node_holder();
+		
+		//seed this : TODO fix this mess
+		$peers  = $this->get_peers_blocking($info_hash, "dht.transmissionbt.com"  , 6881 );
+		
+		//differentiate between returned nodes or peers or FALSE
+		if ($peers == FALSE)
+		{
+			echo "-------- FUNCTION RETURNED FALSE -------------- \n";
+			return;
+		}
+		else if ( is_a($peers[1], 'DHT_node'))
+		{
+			echo "----------- DHT NODES -------------------------- \n";
+			$nodes_holder->add_nodes($peers);
+		}
+		else if ( is_a($peers[1], 'node'))
+		{
+			echo "----------- Bittorrent peers ------------------ \n";
+			
+			foreach($peers as $i)
+			{
+				echo "ip: $i->return_ip() port: $i->return_port() \n";
+			}
+		}
+		else
+		{
+			echo "Function returned something random, please place an issue with the project and copy in the below data; \n ";
+			print_r($peers);
+			return;
+		}
+		
+
+		while(($DHT_node = $nodes_holder->get_next_node()) != FALSE )
+		{
+			$peers = $this->get_peers_blocking($info_hash, $DHT_node->return_ip() , $DHT_node->return_port());
+			
+			//differentiate between returned nodes or peers or FALSE
+			if ($peers == FALSE)
+			{
+				echo "-------- FUNCTION RETURNED FALSE -------------- \n";
+			}
+			else if ( is_a($peers[1], 'DHT_node'))
+			{
+				echo "----------- DHT NODES -------------------------- \n";
+				$nodes_holder->add_nodes($peers);
+			}
+			else if ( is_a($peers[1], 'node'))
+			{
+				echo "----------- Bittorrent peers ------------------ \n";
+				
+				foreach($peers as $i)
+				{
+					echo "ip: $i->return_ip() port: $i->return_port() \n";
+				}
+			}
+			else
+			{
+				echo "Function returned something random, please place an issue with the project and copy in the below data; \n ";
+				print_r($peers);
+				return;
+			}
+			
+		}
+		
+		
 	}
 	
 	public function announce_peer()
@@ -136,9 +205,7 @@ class phpdht
 			
 		}
 		
-		echo "get_unique_node_id = " + $this->node_id + "\n";
-		
-		//just in case i want ot use as return function
+		//just in case i want to use as return function
 
 		return $this->node_id;
 	}
