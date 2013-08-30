@@ -11,9 +11,6 @@ class bencode {
 	//(assoc array)$type = protocol stuff
 	public static function encode($array,$type)
 	{
-		print_r($array);
-		print_r($type);
-		
 		//dictionary 1 start
 		$ret = "d1:a";
 		
@@ -34,7 +31,6 @@ class bencode {
 		$ret .= "e";
 		//dictionary 1 finish
 		
-		echo "construct_bencode output = \n" . $ret . "\n";
 		return $ret;
 	}
 
