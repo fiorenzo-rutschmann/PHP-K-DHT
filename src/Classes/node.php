@@ -8,9 +8,10 @@ class DHT_node {
 	public function __construct($compact)
 	{
 		//make sure $cmpact is 26 bytes else throw exemption
-		if (count($compact) == 26)
+		if (strlen($compact) == 26)
 		{
-			$this->compact = $compact;
+			$this->compact = array();
+			$this->compact = unpack('C*', $compact);
 		}
 		else
 		{
@@ -23,17 +24,23 @@ class DHT_node {
 	
 	public function return_node_id()
 	{
-		return array_slice($this->compact,0, 20);
+		return array_splice($this->compact,0,20);
 	}
 	
 	public function return_ip()
 	{
-		return array_slice($this->compact,20, 4);
+		$ip_string = sprintf("%d.%d.%d.%d", $this->compact[20], $this->compact[21], $this->compact[22], $this->compact[23]);
+		return $ip_string; 
+	}
+	
+	public function return_port_string()
+	{
+		return sprintf("%d", $this->compact[24] << 8 | $this->compact[25]);
 	}
 	
 	public function return_port()
 	{
-		return array_slice($this->compact,24, 2);
+		return $this->compact[24] << 8 | $this->compact[25];
 	}
 	
 	public function return_compact_form()
@@ -68,8 +75,8 @@ class node {
 	
 	public function __construct($compact)
 	{
-		//make sure $cmpact is 6 bytes else throw exemption
-		if (count($compact) == 6)
+		//make sure $compact is 6 bytes else throw exemption
+		if (strlen($compact) == 6)
 		{
 			$this->compact = $compact;
 		}
@@ -81,12 +88,12 @@ class node {
 	
 	public function return_ip()
 	{
-		return array_slice($this->compact,0, 4);
+		return substr($this->compact,0, 4);
 	}
 	
 	public function return_port()
 	{
-		return array_slice($this->compact,4, 2);
+		return substr($this->compact,4, 2);
 	}
 	
 	public function return_compact_form()
