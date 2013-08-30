@@ -1,6 +1,7 @@
 <?php 
 
 	include '..\Client\dht.class.php';
+	include_once '..\Classes\node.php';
 	//spl_autoload_register ();
 	
 	function ping($host, $timeout = 1) {
@@ -62,42 +63,45 @@
 	{	
 		echo "PHP K DHT: \n";
 		echo "Running get_peers \n";
-		echo "valid info_hash = 2E3781F347760F204B278B22AE4ADF9320AACE5E \n";
+		echo "valid info_hash = 2E3781F347760F304B278B22AE4ADF9320AACE5E \n";
 		//$info_hash = readline("Enter a valid info_hash:");
-		$info_hash = "2E3781F347760F205B378B22AE4ADF9320AACE5E";
+		$info_hash = "C797C6D270002A2D507447EEF2FBC4D271309E8C";
 		
-		
+		// // "dht.transmissionbt.com"  , 6881 
+		// "router.utorrent.com" , 6881
 		$lib = new phpdht();
-		$peers = $lib->get_peers($info_hash, "dht.transmissionbt.com", 6881);
+		$peers = $lib->get_peers($info_hash, "124.0.1.1" , 41353 );
 		
-		print_r($peers);
+
 		//ok heres the tricky part, get_peers in the specification returns either nodes or bittorrent peers.
 		
-		
-		//not yet implemented - need to finish off get_peers() first;
 		//differentiate between returned nodes or peers or FALSE
-		/*if ($peers == FALSE)
+		if ($peers == FALSE)
 		{
 			echo "-------- FUNCTION RETURNED FALSE -------------- \n";
 			
 			XJIOP();
 			return;
 		}
-		else if ( get_class($peers[0]) == "DHT_node")
+		else if ( is_a($peers[1], 'DHT_node'))
 		{
-			echo "Function returned DHT nodes \n";
+			echo "----------- DHT NODES -------------------------- \n";
 			
-			echo "will create functionality later for this...\n";
-			
-			XJIOP();
-			return;
-		}
-		else if ( get_class($peers[0]) == "node")
-		{
-			echo "Function returned Bittorrent nodes at address's : \n";
 			foreach($peers as $i)
 			{
-				echo "ip: $i->return_ip() posrt: $i->return_port() \n";
+				echo "DHT_id: " . vsprintf("%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",$i->return_node_id()) . " ip:" . $i->return_ip() . "\tport:" . $i->return_port_string() . "\n";
+			}
+			
+			//XJIOP();
+			return;
+		}
+		else if ( is_a($peers[1], 'node'))
+		{
+			echo "----------- Bittorrent peers ------------------ \n";
+			
+			foreach($peers as $i)
+			{
+				echo "ip: $i->return_ip() port: $i->return_port() \n";
 			}
 		}
 		else
@@ -106,7 +110,25 @@
 			print_r($peers);
 			
 			return;
-		}*/
+		}
+		
+	}
+	
+	function get_peers_recursive()
+	{
+		//turn off those damn socket warnings 
+		error_reporting(E_ERROR | E_PARSE);
+		
+		echo "Getting peers()";
+		
+		$info_hash = '31FE2672E754DDD7AC57543219329A95E61E0F77'; //most popular torrent on tpb atm
+		
+		$lib = new phpdht();
+		
+		$lib->get_peers_for_info_hash_blocking($info_hash);
+		
+		return;
+		
 		
 	}
 	
@@ -121,7 +143,8 @@
 		echo hex2bin("2E3781F347760F204B278B22AE4ADF9320AACE5E");
 	}
 	
-	XJIOP();
+	get_peers_recursive();
+	//XJIOP();
 	//quick();
 	//just to take away the socket notice
 	//error_reporting(E_ALL ^ E_WARNING);
